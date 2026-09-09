@@ -11,10 +11,9 @@ def rand(amount):
     return f"{'-' if amount < 0 else ''}R{abs(amount):,.2f}"
 
 
-st.set_page_config(page_title="Monthly Budget Planner", page_icon="🌱", layout="wide")
+st.set_page_config(page_title="BUDGET PLANNER", page_icon="🌱", layout="wide")
 
-st.caption("PROJECT 01 · PAYCHECK PLANNING")
-st.title("Give your paycheck a plan.")
+st.title("BUDGET PLANNER")
 st.write("Plan your monthly expenses and savings, and see what you have left.")
 st.caption("Start with the sample figures below, then replace them with your own.")
 
