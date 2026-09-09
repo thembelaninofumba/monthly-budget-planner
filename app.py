@@ -11,11 +11,10 @@ def rand(amount):
     return f"{'-' if amount < 0 else ''}R{abs(amount):,.2f}"
 
 
-st.set_page_config(page_title="BUDGET PLANNER", page_icon="🌱", layout="wide")
+st.set_page_config(page_title="BUDGET PLANNER", layout="wide")
 
 st.title("BUDGET PLANNER")
-st.write("Plan your monthly expenses and savings, and see what you have left.")
-st.caption("Start with the sample figures below, then replace them with your own.")
+st.caption("Example amounts are shown below. Replace them with your income and budget.")
 
 today = date.today()
 months = [date(year, month, 1)
@@ -28,7 +27,7 @@ with month_column:
         "Budget month", months,
         index=months.index(today.replace(day=1)),
         format_func=lambda value: value.strftime("%B %Y"),
-        help="Labels this plan and its download. Changing it does not load a saved budget.",
+        help="The month for this budget and CSV. Previous budgets aren't saved.",
         key="month",
     )
 with income_column:
@@ -44,8 +43,8 @@ st.divider()
 editor_column, chart_column = st.columns([1.1, 1], gap="large")
 
 with editor_column:
-    st.subheader("Where your money goes")
-    st.caption("Edit a cell and press Enter. Add categories in the empty row; select rows to delete them.")
+    st.subheader("Monthly budget")
+    st.caption("Edit cells, add a row, or select rows to delete them.")
     sample = pd.DataFrame([
         {"Category": "Rent", "Amount": 5000.0},
         {"Category": "Groceries", "Amount": 2500.0},
@@ -63,7 +62,7 @@ with editor_column:
             ),
         },
     )
-    st.caption("Savings are included in your allocations.")
+    st.caption("Include savings as a budget item.")
 
 # pandas represents empty cells as missing values; normalise them for validation.
 rows = edited.astype(object).where(pd.notna(edited), None).to_dict("records")
@@ -77,24 +76,24 @@ except ValueError as error:
 with summary_area:
     pay_metric, allocated_metric, remaining_metric = st.columns(3)
     pay_metric.metric("Take-home pay", rand(budget.income))
-    allocated_metric.metric("Total allocated", rand(budget.allocated))
-    remaining_metric.metric("Left to allocate", rand(budget.remaining))
+    allocated_metric.metric("Budgeted", rand(budget.allocated))
+    remaining_metric.metric("Remaining", rand(budget.remaining))
 
     if budget.remaining < 0:
-        st.warning(f"You're over budget by {rand(-budget.remaining)}. Adjust your allocations.")
+        st.warning(f"{rand(-budget.remaining)} over budget.")
     elif budget.income == 0:
-        st.info("Enter your take-home pay to start planning.")
+        st.info("Enter your monthly take-home pay.")
     elif budget.remaining == 0:
-        st.success("Your paycheck is fully allocated.")
+        st.success("Your budget matches your income.")
     else:
-        st.success(f"You have {rand(budget.remaining)} available to allocate.")
+        st.success(f"{rand(budget.remaining)} left to budget.")
 
     if budget.income > 0:
         proportion = float(budget.allocated / budget.income)
-        st.progress(min(proportion, 1.0), text=f"{proportion:.1%} of your paycheck allocated")
+        st.progress(min(proportion, 1.0), text=f"{proportion:.1%} of income budgeted")
 
 with chart_column:
-    st.subheader("Your allocation breakdown")
+    st.subheader("By category")
     if budget.allocated > 0:
         chart_data = pd.DataFrame(
             [(category, float(amount)) for category, amount in budget.entries],
@@ -107,7 +106,7 @@ with chart_column:
             color="#087F6D", height=300, width="stretch",
         )
     else:
-        st.info("Add an amount to a category to see your breakdown.")
+        st.info("Add budget amounts to see the chart.")
 
 st.divider()
 st.download_button(
@@ -116,4 +115,4 @@ st.download_button(
     file_name=f"budget-{month:%Y-%m}.csv",
     mime="text/csv", type="primary",
 )
-st.caption("Your plan stays in this session only. Download a CSV before closing or refreshing the page.")
+st.caption("Changes aren't saved between visits. Download your CSV before closing or refreshing.")

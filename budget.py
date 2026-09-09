@@ -1,4 +1,4 @@
-"""Budget calculations kept separate from the web interface."""
+"""Currency validation, budget totals and CSV export."""
 import csv
 import io
 from dataclasses import dataclass
@@ -9,7 +9,7 @@ MAX_AMOUNT = Decimal("1000000000.00")
 
 
 def money(value, label):
-    """Convert an input to exact cents, rejecting unusable amounts."""
+    """Validate an amount and round to cents."""
     try:
         amount = Decimal(str(value))
     except (InvalidOperation, ValueError):
@@ -28,7 +28,7 @@ class Budget:
 
 
 def summarize(income, rows):
-    """Validate editor rows and calculate how much pay is still available."""
+    """Validate budget rows and calculate the balance."""
     pay = money(income, "Take-home pay")
     entries = []
     for number, row in enumerate(rows, start=1):
@@ -44,7 +44,7 @@ def summarize(income, rows):
 
 
 def export_csv(month, budget):
-    """Build a spreadsheet-friendly CSV, including income and remaining funds."""
+    """Export income, budget items and totals as CSV."""
     output = io.StringIO(newline="")
     writer = csv.writer(output)
     writer.writerow(["Month", "Type", "Category", "Amount (ZAR)"])
