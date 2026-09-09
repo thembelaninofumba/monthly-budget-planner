@@ -1,26 +1,56 @@
 # Monthly Budget Planner
 
-A small Python data app for planning where your monthly paycheck goes. Project 1 of a coding challenge.
+Plan how to divide your monthly take-home pay between expenses and savings. Enter your income, adjust your categories, and see how much is left to allocate.
 
-**[Open the Live Demo](https://monthly-budget-planner-yfgjesuspchtoocycbz448.streamlit.app/)**
+**[Try the Live Demo](https://monthly-budget-planner-yfgjesuspchtoocycbz448.streamlit.app/)** — no installation needed.
 
-## What it does
+Built with **Python, Streamlit and pandas** as project 1 of a coding challenge.
 
-- Enter take-home pay in South African rand and choose the month.
-- Add, rename, edit and delete budget categories.
-- See income, total allocated and remaining balance update immediately.
-- Get an over-budget warning and a chart of allocations.
-- Download a CSV containing the full plan and totals.
+## Features
 
-The starting amounts are sample data: R15,000 income, R11,000 allocated and R4,000 remaining. Savings count as allocated money.
+- Plan a month in South African rand (ZAR).
+- Add, edit and remove budget categories.
+- See take-home pay, total allocated and remaining balance update as you make changes.
+- Get a warning when allocations exceed your income.
+- View a chart of allocations by category.
+- Download a CSV containing the month, income, allocations and totals.
 
-**Storage:** This starter keeps your changes in the current browser session only. Refreshing or closing the session can reset the plan. Download the CSV to keep a copy. Changing the month labels the current plan; it does not retrieve a saved budget. CSV import and a database are future improvements.
+## Try the example
 
-## Run on Windows
+The app opens with sample figures:
 
-Install Python 3.11 or newer from [python.org](https://www.python.org/downloads/windows/) if needed. This starter was tested with Python 3.14.
+| Item | Amount |
+| --- | ---: |
+| Take-home pay | R15,000 |
+| Rent | R5,000 |
+| Groceries | R2,500 |
+| Transport | R1,500 |
+| Savings | R2,000 |
+| **Left to allocate** | **R4,000** |
 
-Open PowerShell in this project folder. For a new checkout:
+Change take-home pay to **R10,000** to see the over-budget warning.
+
+Double-click a table cell to edit it and press Enter to apply the change. Add a category in the empty bottom row, or select a row and use the table's delete control to remove it. Savings count as an allocation.
+
+## Storage and limitations
+
+- Changes last for the current session only. Refreshing or closing the page can reset the plan.
+- Download the CSV to keep a copy. CSV import is not available yet.
+- Changing the month labels the current plan; it does not open a previously saved budget.
+- This version supports ZAR only. It does not connect to bank accounts or track actual transactions.
+
+## Run locally
+
+You need **Git** and **Python 3.11 or newer**. Local verification was performed on Windows with Python 3.14.
+
+Clone the repository and enter its folder:
+
+```sh
+git clone https://github.com/thembelaninofumba/monthly-budget-planner.git
+cd monthly-budget-planner
+```
+
+### Windows (PowerShell)
 
 ```powershell
 python -m venv .venv
@@ -28,100 +58,61 @@ python -m venv .venv
 .\.venv\Scripts\python.exe -m streamlit run app.py
 ```
 
-If the environment is already set up, run this from the project folder:
+Once setup is complete, you can also double-click `run.bat` to start the app.
 
-```powershell
-.\.venv\Scripts\python.exe -m streamlit run app.py
+### macOS / Linux
+
+```sh
+python3 -m venv .venv
+.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m streamlit run app.py
 ```
 
-Or double-click **run.bat**. Open the local URL printed in the terminal, normally http://localhost:8501. Press Ctrl+C in that terminal to stop the server. No environment activation or PowerShell execution-policy change is required.
+Open the local URL printed in the terminal, normally **http://localhost:8501**. Press **Ctrl+C** in the terminal to stop the app.
 
-## Try it
+## Project structure
 
-1. The example starts with R4,000 left to allocate.
-2. Change take-home pay to R10,000: the remaining balance becomes -R1,000 and a warning appears.
-3. Edit an amount by double-clicking its table cell and pressing Enter.
-4. Add a category in the empty bottom row. Select a row and use the table's delete control to remove it.
-5. Choose **Download budget CSV** to save your current plan.
+| File | Responsibility |
+| --- | --- |
+| [app.py](app.py) | Streamlit interface, editable table, metrics and chart |
+| [budget.py](budget.py) | Input validation, currency calculations and CSV export |
+| [tests/test_budget.py](tests/test_budget.py) | Calculation, validation and export tests |
+| [tests/test_app.py](tests/test_app.py) | Streamlit interaction tests |
+| [.streamlit/config.toml](.streamlit/config.toml) | Theme and usage telemetry settings |
+| [requirements.txt](requirements.txt) | Pinned direct dependencies |
+| [run.bat](run.bat) | Windows launcher |
 
-Use invented numbers when taking a screenshot for the public repository.
+Money inputs are converted to Python's `Decimal` type before calculations and rounded to cents. pandas organises the table data and groups category totals for the chart. Streamlit reruns the interface when inputs change.
 
-## How the code works
+## Run tests
 
-Read these files in this order:
+After installing the dependencies, run:
 
-| File | Purpose | What you learn |
-| --- | --- | --- |
-| `budget.py` | Validates inputs, calculates totals and creates CSV | Functions, loops, dataclasses, Decimal, exceptions |
-| `app.py` | Draws inputs, the table, metrics and chart | Streamlit, pandas DataFrames and reruns |
-| `tests/test_budget.py` | Checks money calculations with known answers | Automated testing and edge cases |
-| `tests/test_app.py` | Exercises the actual app | Testing user interactions |
-| `.streamlit/config.toml` | Sets colours and disables usage telemetry | App configuration |
-| `requirements.txt` | Pins direct dependency versions | Python dependency management |
-
-### Coming from PHP
-
-Python variable names do not start with a dollar sign. Indentation defines blocks instead of braces. A dictionary resembles a PHP associative array:
-
-```python
-expense = {"Category": "Groceries", "Amount": 2500}
-print(expense["Category"])
-```
-
-The essential calculation is:
-
-```python
-allocated = sum(amount for category, amount in entries)
-remaining = income - allocated
-```
-
-The actual implementation uses `Decimal` amounts so money is calculated in exact cents. A `ValueError` tells the interface to show a helpful message when input is invalid.
-
-Streamlit runs `app.py` again when an input changes. The edited table becomes a list of dictionaries, `summarize()` validates and calculates it, and the results are rendered. pandas groups category totals for the chart. The input widgets and chart use floats; inputs are converted to Decimal before calculating money totals.
-
-### Small exercises after the walkthrough
-
-1. Add an emergency-fund category to the example.
-2. Add a metric showing savings as a percentage of income; handle zero income.
-3. Add CSV import so users can reopen a downloaded plan.
-4. Save months in SQLite, then practise SQL queries comparing allocations over time.
-
-## Run the tests
+**Windows**
 
 ```powershell
 .\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
 
-The tests cover exact cents, overspending, zero income, incomplete/invalid input, spreadsheet-safe CSV exports and Streamlit interactions.
+**macOS / Linux**
 
-## Put the code on GitHub
-
-Create an empty repository named `monthly-budget-planner` in your GitHub account. From this project folder, use the following if you have not already initialised Git:
-
-```powershell
-git init -b main
-git add .
-git commit -m "Build monthly budget planner"
+```sh
+.venv/bin/python -m unittest discover -s tests -v
 ```
 
-Then follow GitHub's **push an existing repository** instructions to add your repository as `origin` and push. The project's `.gitignore` excludes the Python environment, secrets and downloaded budget CSVs.
+The tests cover exact cents, overspending, zero income, invalid rows, CSV output and app interactions such as changing income and adding or deleting categories.
 
-The live app is linked at the top of this README. You can add a screenshot using the sample figures.
+## Deploy your own copy
 
-## Host the interface
+1. Fork this repository to your GitHub account.
+2. Sign in to [Streamlit Community Cloud](https://share.streamlit.io/) and select **Create app**.
+3. Select your fork, branch `main`, and main file path **`app.py`**.
+4. Choose a supported Python version of 3.11 or newer in advanced settings, then deploy.
 
-Use [Streamlit Community Cloud](https://docs.streamlit.io/deploy/streamlit-community-cloud). It connects to your GitHub repository and hosts the Python app.
+See the [Streamlit deployment guide](https://docs.streamlit.io/deploy/streamlit-community-cloud/deploy-your-app/deploy) for details. GitHub stores the source code; Streamlit Community Cloud runs the Python interface.
 
-1. Push the source files, including `app.py`, `budget.py` and `requirements.txt`, to GitHub.
-2. Sign in to Streamlit Community Cloud and choose **Create app**.
-3. Select your repository and branch; set the entrypoint to `app.py`.
-4. Select a supported Python version of 3.11 or newer in advanced settings.
-5. Deploy, then place the resulting `.streamlit.app` link in your GitHub repository description.
+## Possible next steps
 
-GitHub Pages cannot run the Streamlit Python server. See [GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site).
-
-## References
-
-- [Streamlit data editor](https://docs.streamlit.io/develop/api-reference/data/st.data_editor)
-- [Streamlit app testing](https://docs.streamlit.io/develop/concepts/app-testing/get-started)
-- [pandas getting started](https://pandas.pydata.org/docs/getting_started/)
+- Import an exported CSV to reopen a plan.
+- Save monthly budgets with SQLite.
+- Compare planned allocations with actual spending.
