@@ -2,6 +2,8 @@
 
 A small Python data app for planning where your monthly paycheck goes. Project 1 of a coding challenge.
 
+**[Open the Live Demo](https://monthly-budget-planner-yfgjesuspchtoocycbz448.streamlit.app/)**
+
 ## What it does
 
 - Enter take-home pay in South African rand and choose the month.
@@ -104,7 +106,7 @@ git commit -m "Build monthly budget planner"
 
 Then follow GitHub's **push an existing repository** instructions to add your repository as `origin` and push. The project's `.gitignore` excludes the Python environment, secrets and downloaded budget CSVs.
 
-Add a screenshot and the live app URL to this README after deployment.
+The live app is linked at the top of this README. You can add a screenshot using the sample figures.
 
 ## Host the interface
 
